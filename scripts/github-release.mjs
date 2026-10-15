@@ -5,6 +5,7 @@ const owner = 'amazingLH';
 const repo = 'mcd-secret-table';
 const contest = 'M-China/mcd-developer-innovation-challenge';
 const repositoryUrl = `https://github.com/${owner}/${repo}`;
+const projectDescription = '麦麦密桌 SecretTable：浏览器本地偏好评估 + 大模型 Agent 协商 + 麦当劳 MCP 官方核价';
 const raw = execFileSync('git', ['credential', 'fill'], {
   input: `protocol=https\nhost=github.com\nusername=${owner}\n\n`,
   encoding: 'utf8', windowsHide: true, stdio: ['pipe', 'pipe', 'ignore'],
@@ -44,11 +45,11 @@ async function main() {
   } else if (mode === 'create') {
     const existing = await api('GET', repositoryPath, undefined, true);
     if (existing) {
-      if (existing.private || existing.description !== '麦麦密桌 SecretTable：浏览器本地偏好评估 + 千问 Agent 协商 + 麦当劳 MCP 官方核价') throw new Error('Existing repository does not match this publication.');
+      if (existing.private || ![projectDescription, '麦麦密桌 SecretTable：浏览器本地偏好评估 + 千问 Agent 协商 + 麦当劳 MCP 官方核价'].includes(existing.description)) throw new Error('Existing repository does not match this publication.');
       console.log(JSON.stringify({ repository: existing.html_url, reused: true })); return;
     }
     const result = await api('POST', '/user/repos', { name: repo, private: false, auto_init: false,
-      description: '麦麦密桌 SecretTable：浏览器本地偏好评估 + 千问 Agent 协商 + 麦当劳 MCP 官方核价',
+      description: projectDescription,
       has_issues: true, has_projects: false, has_wiki: false });
     console.log(JSON.stringify({ repository: result.html_url, public: !result.private, created: true }));
   } else if (mode === 'pages') {
@@ -93,10 +94,18 @@ async function main() {
       title: '【参赛申请】麦麦密桌 SecretTable —— 私人条件留在本地，Agent 协商一桌共识', body,
     });
     console.log(JSON.stringify({ issue: issue.html_url, number: issue.number, submitted: true }));
+  } else if (mode === 'update-submission') {
+    const issue = await api('GET', `/repos/${contest}/issues/755`);
+    if (issue.user.login !== owner || !issue.body?.includes(repositoryUrl)) throw new Error('Existing submission ownership or project link differs.');
+    const body = (await readFile('docs/CONTEST_ISSUE.md', 'utf8')).trim();
+    if (body.length > 1000 || !body.includes(`项目地址：${repositoryUrl}`)) throw new Error('Updated issue body failed local format check.');
+    if (body === issue.body.trim()) { console.log(JSON.stringify({ issue: issue.html_url, updated: false, alreadyCurrent: true })); return; }
+    const updated = await api('PATCH', `/repos/${contest}/issues/755`, { body });
+    console.log(JSON.stringify({ issue: updated.html_url, number: updated.number, updated: true, officialCommentsModified: false }));
   } else if (mode === 'homepage') {
     const pages = await api('GET', repositoryPath + '/pages');
-    await api('PATCH', repositoryPath, { homepage: pages.html_url });
-    await api('PUT', repositoryPath + '/topics', { names: ['ai-agent', 'mcp', 'mcdonalds', 'qwen', 'privacy', 'typescript', 'agent-skill'] });
+    await api('PATCH', repositoryPath, { homepage: pages.html_url, description: projectDescription });
+    await api('PUT', repositoryPath + '/topics', { names: ['ai-agent', 'mcp', 'mcdonalds', 'deepseek', 'qwen', 'privacy', 'typescript', 'agent-skill'] });
     console.log(JSON.stringify({ homepage: pages.html_url, topicsUpdated: true }));
   } else throw new Error('Unknown release command.');
 }

@@ -176,6 +176,31 @@ input:disabled { background: #ece7dd; }
 .empty-state > span { color: #a08e79; font: 400 38px monospace; }.empty-state > strong { font-size: 16px; }
 .empty-state > p { color: #8b7d70; font-size: 12px; line-height: 1.9; max-width: 340px; margin: 0; }
 .model-explanation { margin: 12px 20px 24px; padding: 16px; background: #f0eadf; border-left: 3px solid #8f7ba9; font-size: 13px; color: #66594d; line-height: 1.8; }
+.model-explanation p { margin: 8px 0; overflow-wrap: anywhere; }
+.model-explanation small { color: #817468; font-size: 11px; }
+.evaluation-guide { padding: 16px 20px; font-size: 12px; line-height: 1.8; border-bottom: 1px solid var(--line); }
+.evaluation-guide > strong { font-size: 13px; color: var(--green); }
+.evaluation-guide p { margin: 7px 0; color: #716253; }
+.evaluation-guide summary, .candidate-details summary { cursor: pointer; font-weight: 600; }
+.proposal-card { margin-top: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.52); }
+.proposal-card .proposal-row { margin: 0; border: 0; background: none; grid-template-columns: 26px minmax(0,1fr) 132px 82px; }
+.selected-proposal { border: 2px solid var(--green); background: #edf6ef; box-shadow: 0 0 0 2px #dceee4; }
+.selected-proposal .proposal-rank { color: var(--green); }
+.participant-vote { display: flex; align-items: center; flex-direction: column; gap: 5px; }
+.participant-vote small { font-size: 9px; color: #756558; white-space: nowrap; }
+.fair-score strong { font-size: 15px; }
+.candidate-status { display: flex; justify-content: space-between; gap: 8px; padding: 4px 12px 10px; color: #756558; font-size: 12px; }
+.selected-proposal .candidate-status { color: var(--green); font-weight: 800; }
+.candidate-status small { font-size: 11px; font-weight: 400; }
+.candidate-details { padding: 10px 12px; border-top: 1px solid var(--line); font-size: 11px; line-height: 1.8; }
+.candidate-person { display: grid; gap: 3px; padding-top: 10px; }
+.candidate-person span { overflow-wrap: anywhere; color: #65584d; }
+.candidate-person small { color: #817468; }
+.selected-summary { grid-column: 1 / -1; padding: 18px 20px; border-bottom: 1px solid var(--line); background: #edf6ef; line-height: 1.8; }
+.selected-summary strong, .selected-summary span { display: block; }
+.selected-summary strong { color: var(--green); font-size: 15px; }
+.selected-summary span, .selected-summary p { font-size: 11px; color: #716253; margin: 5px 0 0; }
+@media (max-width: 600px) { .proposal-card .proposal-row { grid-template-columns: 22px minmax(0,1fr); gap: 10px; }.proposal-card .votes { grid-column: 2; }.proposal-card .fair-score { display: block; grid-column: 2; text-align: left; }.proposal-card .fair-score span { display: inline; margin-right: 8px; }.participant-vote small { font-size: 10px; }.proposal-card .votes span { width: 34px; }.selected-summary { padding: 15px; } }
 .live-trace { max-height: 430px; min-height: 250px; overflow-y: auto; padding: 8px 18px; }
 .live-event { display: flex; align-items: start; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .live-event > div { min-width: 0; }.live-event strong { font: 500 11px monospace; overflow-wrap: anywhere; }
