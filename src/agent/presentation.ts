@@ -18,7 +18,13 @@ export function explainIdentifiers(text: string, menu: MenuItem[], participants:
       return tail.startsWith(`（${name}）`) || tail.startsWith(`(${name})`) ? id : `${id}（${name}）`;
     },
   ) : text;
-  return readable.replace(/\butility\b/gi, '满意度');
+  const withRounds = readable.replace(/(?<![A-Za-z0-9_./:@-])r([1-3])(?:-p([1-4]))?(?![A-Za-z0-9_.-])/g,
+    (id: string, round: string, proposal: string | undefined, offset: number) => {
+      const label = `第${round}轮协商${proposal ? `·方案${proposal}` : ''}`;
+      const tail = readable.slice(offset + id.length);
+      return tail.startsWith(`（${label}）`) || tail.startsWith(`(${label})`) ? id : `${id}（${label}）`;
+    });
+  return withRounds.replace(/\butility\b/gi, '满意度');
 }
 
 export function mealWithCode(id: string, menu: MenuItem[]) {

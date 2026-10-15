@@ -8,6 +8,19 @@ const people = [{ agentId: 'a1', displayName: '参与者 1' }];
 const ranked = rankProposals(demoProposals, demoProfiles.map((p) => createPrivatePreferenceAgent(p, demoMenu)));
 
 describe('面向用户的解释与选中状态', () => {
+  it('解释协商轮次和完整候选编号，而不拆散原始编号', () => {
+    expect(explainIdentifiers('a1对r1两份方案未接受，比较r2-p1、r3-p4。', menu, people))
+      .toBe('a1（参与者 1）对r1（第1轮协商）两份方案未接受，比较r2-p1（第2轮协商·方案1）、r3-p4（第3轮协商·方案4）。');
+    expect(explainIdentifiers('r1', [])).toBe('r1（第1轮协商）');
+  });
+  it('轮次说明幂等，不改写链接、文件名或不支持的编号', () => {
+    const raw = 'r1（第1轮协商） r2-p1(第2轮协商·方案1)';
+    expect(explainIdentifiers(raw, [])).toBe(raw);
+    const once = explainIdentifiers('r1和r2-p2', []);
+    expect(explainIdentifiers(once, [])).toBe(once);
+    expect(explainIdentifiers('r10 r1-p10 model-r1 r1.json https://r1/path', []))
+      .toBe('r10 r1-p10 model-r1 r1.json https://r1/path');
+  });
   it('给真实编号和匿名参与者补名称，并解释 utility', () => {
     expect(explainIdentifiers('a1只接受含1440的组合（utility=100），1450+小食。', menu, people))
       .toBe('a1（参与者 1）只接受含1440（麦辣鸡腿汉堡）的组合（满意度=100），1450（麦香鸡）+小食。');
