@@ -67,6 +67,16 @@ async function main() {
       issue: issue ? { url: issue.html_url, number: issue.number, state: issue.state } : null,
       comments: comments.map((comment) => ({ author: comment.user.login, body: comment.body, url: comment.html_url })),
     }, null, 2));
+  } else if (mode === 'audit') {
+    const issue = await api('GET', `/repos/${contest}/issues/755`);
+    const recent = await api('GET', `/repos/${contest}/issues?state=all&per_page=8`);
+    const examples = await Promise.all(recent.filter((item) => item.number < 755 && !item.pull_request).slice(0, 3).map(async (item) => {
+      const comments = await api('GET', `/repos/${contest}/issues/${item.number}/comments`);
+      return { number: item.number, createdAt: item.created_at,
+        officialReplies: comments.filter((comment) => comment.author_association === 'COLLABORATOR' || /M-China/.test(comment.user.login))
+          .map((comment) => ({ at: comment.created_at, author: comment.user.login, body: comment.body })) };
+    }));
+    console.log(JSON.stringify({ submittedIssue: { number: issue.number, createdAt: issue.created_at, labels: issue.labels.map((label) => label.name), comments: issue.comments }, recentReviewExamples: examples }, null, 2));
   } else if (mode === 'register') {
     const repository = await api('GET', repositoryPath);
     if (repository.private) throw new Error('Competition repository must be public.');

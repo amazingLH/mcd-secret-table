@@ -12,6 +12,8 @@
 
 **[在线体验：无需 Token 的固定数据演示](https://amazinglh.github.io/mcd-secret-table/)** · **[真实浏览器验收记录](./evidence/BROWSER_QA.md)** · **[模型与 MCP 实测证据](./evidence/live-agent.json)**
 
+比赛报名：[官方赛事 Issue #755](https://github.com/M-China/mcd-developer-innovation-challenge/issues/755)（已提交，官方回执以 Issue 回复为准）。[发布状态记录](./docs/SUBMISSION_STATUS.md)
+
 在线演示不调用模型、MCP 或交易接口。真实协商请按下文在本机启动，密钥仅保留在本机。
 
 ![真实模型协商与官方核价的网页验收截图](./evidence/browser-live-result.png)
