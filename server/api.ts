@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { prepareTable, proposeRound, quoteProposal } from './liveAgent';
 import { PublicError, object, onlyKeys } from './validation';
-import { modelName } from './model';
+import { modelAccessIssue, modelName } from './model';
 import type { LiveTrace } from '../src/agent/liveTypes';
 
 async function readBody(req: IncomingMessage): Promise<unknown> {
@@ -26,7 +26,8 @@ export async function handleApi(req: IncomingMessage, res: ServerResponse): Prom
     res.setHeader('cache-control', 'no-store');
     if (pathname === '/api/health' && req.method === 'GET') {
       res.setHeader('content-type', 'application/json');
-      res.end(JSON.stringify({ status: 'ok', model: modelName(), modelConfigured: Boolean(process.env.DASHSCOPE_API_KEY), readOnly: true }));
+      const modelCallBlockReason = modelAccessIssue();
+      res.end(JSON.stringify({ status: 'ok', model: modelName(), modelConfigured: !modelCallBlockReason, modelCallBlockReason, readOnly: true }));
       return;
     }
     if (req.method !== 'POST' || !String(req.headers['content-type']).startsWith('application/json')) throw new PublicError('请使用 JSON POST 请求。', 405);

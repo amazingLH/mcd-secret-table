@@ -8,6 +8,8 @@ export interface LiveTrace {
   at: string;
   traceId?: string;
   responseId?: string;
+  model?: string;
+  usageTokens?: number;
 }
 
 export interface LiveMenuItem extends MenuItem {

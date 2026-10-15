@@ -3,8 +3,8 @@ import { connectMcdClient } from './mcdClient';
 import { readMcdResponse } from './mcpResponse';
 import { requireReadOnlyTool } from './readOnlyPolicy';
 import { describeItem, parseNutrition } from './catalog';
-import { callCoordinator, modelName, type ModelMessage, type ModelTool } from './model';
-import { object, onlyKeys, PublicError, validateFeedback, validateOffers, validateProposals } from './validation';
+import { callCoordinator, modelName, requireModelAccess, type ModelMessage, type ModelTool } from './model';
+import { object, onlyKeys, PublicError, validateFeedback, validateOffers, selectValidProposals } from './validation';
 import type { LiveTable, LiveTrace, OfficialQuote, ProposalRound } from '../src/agent/liveTypes';
 import type { Proposal } from '../src/agent/types';
 
@@ -54,7 +54,7 @@ export async function prepareTable(input: unknown, emit: Emit): Promise<LiveTabl
   if (typeof request.city !== 'string' || !request.city.trim() || request.city.length > 30 || typeof request.keyword !== 'string' || !request.keyword.trim() || request.keyword.length > 100) throw new PublicError('请填写城市与共同用餐地点。');
   if (!Array.isArray(request.participants) || request.participants.length < 2 || request.participants.length > 6 || request.participants.some((id) => typeof id !== 'string' || !/^[a-zA-Z0-9_-]{1,24}$/.test(id)) || new Set(request.participants).size !== request.participants.length) throw new PublicError('参与者须为 2–6 个不重复的匿名编号。');
   if (typeof request.publicBudget !== 'number' || !Number.isFinite(request.publicBudget) || request.publicBudget < 20 || request.publicBudget > 1000) throw new PublicError('共同公开预算须为 20–1000 元。');
-  if (!process.env.DASHSCOPE_API_KEY) throw new PublicError('未配置 DASHSCOPE_API_KEY，暂不能运行大模型协商。', 503);
+  requireModelAccess();
   for (const [id, value] of sessions) if (Date.now() - Date.parse(value.table.createdAt) > TTL) sessions.delete(id);
   if (sessions.size >= 20) throw new PublicError('本地会话过多，请稍后重试。', 429);
   const traces: LiveTrace[] = [];
@@ -121,10 +121,10 @@ const proposalTool: ModelTool = {
     parameters: {
       type: 'object', additionalProperties: false, required: ['explanation', 'proposals'],
       properties: {
-        explanation: { type: 'string', description: '用一两句话解释本轮如何利用公开反馈调整方案，不推断私密条件。' },
+        explanation: { type: 'string', maxLength: 600, description: '用一两句话解释本轮如何利用公开反馈调整方案，不推断私密条件。' },
         proposals: { type: 'array', minItems: 1, maxItems: 4, items: {
           type: 'object', additionalProperties: false, required: ['label', 'assignments'],
-          properties: { label: { type: 'string' }, assignments: { type: 'array', items: {
+          properties: { label: { type: 'string', maxLength: 60 }, assignments: { type: 'array', items: {
             type: 'object', additionalProperties: false, required: ['agentId', 'itemIds'],
             properties: { agentId: { type: 'string' }, itemIds: { type: 'array', minItems: 1, maxItems: 3, items: { type: 'string' } } },
           } } },
@@ -161,21 +161,35 @@ export async function proposeRound(id: string, input: unknown, emit: Emit): Prom
     };
     const messages: ModelMessage[] = [ { role: 'system', content: system }, { role: 'user', content: JSON.stringify(publicContext) } ];
     let result: ProposalRound | undefined;
+    let totalUsageTokens = 0;
+    let lastValidationError = '';
     for (let attempt = 0; attempt < 2; attempt++) {
       const completion = await callCoordinator(messages, proposalTool);
+      totalUsageTokens += completion.usageTokens;
+      const responseTrace = trace('model', 'model-response', `第 ${round} 轮第 ${attempt + 1} 次模型返回，消耗 ${completion.usageTokens} Token（抵扣方式以百炼账单为准）。`, {
+        responseId: completion.responseId, model: completion.model, usageTokens: completion.usageTokens,
+      });
+      session.traces.push(responseTrace); emit(responseTrace);
       try {
-        const validated = validateProposals(completion.arguments, session.table, round);
-        result = { round, ...validated, responseId: completion.responseId, model: completion.model, usageTokens: completion.usageTokens };
+        const validated = selectValidProposals(completion.arguments, session.table, round);
+        if (validated.rejected.length) {
+          const discardedTrace = trace('model', 'discard-invalid-candidates', validated.rejected.join('；'), { responseId: completion.responseId });
+          session.traces.push(discardedTrace); emit(discardedTrace);
+        }
+        result = { round, explanation: validated.explanation, proposals: validated.proposals, responseId: completion.responseId, model: completion.model, usageTokens: totalUsageTokens };
         break;
       } catch (error) {
         if (!(error instanceof PublicError)) throw error;
+        lastValidationError = error.message;
+        const rejectedTrace = trace('model', 'reject-proposal', error.message, { responseId: completion.responseId });
+        session.traces.push(rejectedTrace); emit(rejectedTrace);
         messages.push({ role: 'user', content: JSON.stringify({
           previousRejectedOutput: completion.arguments, validationError: error.message,
           instruction: '重新调用工具。至少提供一份仅由主食构成的低价方案，严格使用 menu 中的编号与 kind，整桌不能超过 publicBudget。',
         }) });
       }
     }
-    if (!result) throw new PublicError('模型两次输出未通过商品或共同预算校验，请重新开桌。', 502);
+    if (!result) throw new PublicError(`模型两次输出未通过校验：${lastValidationError} 本轮合计消耗 ${totalUsageTokens} Token，已停止重试。`, 502);
     session.round = round;
     session.lastProposals = result.proposals;
     for (const proposal of result.proposals) session.allProposals.set(proposal.id, proposal);

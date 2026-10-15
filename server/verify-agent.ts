@@ -15,7 +15,7 @@ async function main() {
   if (!address || typeof address === 'string') throw new Error('未建立本地验收服务。');
   const base = `http://127.0.0.1:${address.port}`;
   const traces: LiveTrace[] = [];
-  const emit = (event: LiveTrace) => { traces.push(event); console.log(`${event.actor}: ${event.action}`); };
+  const emit = (event: LiveTrace) => { traces.push(event); console.log(`${event.actor}: ${event.action}${event.actor === 'model' ? ` ${event.message}` : ''}`); };
   const profiles = demoProfiles.map((p, index) => ({ ...p, agentId: `a${index + 1}`, requiredTags: [] }));
   try {
     const table = await liveRequest<LiveTable>(base + '/api/tables', {

@@ -1,27 +1,27 @@
 {
   "mode": "live-model-and-mcp",
-  "verifiedAt": "2026-10-15T05:58:23.603Z",
+  "verifiedAt": "2026-10-15T12:48:03.967Z",
   "testConditions": "合成的本地三人偏好；原始预算和偏好未发送到 API。公共地点：上海人民广场。",
   "store": {
     "code": "1450713",
     "name": "麦当劳上海黄浦华旭国际大厦餐厅"
   },
-  "menuItems": 14,
+  "menuItems": 13,
   "rounds": [
     {
       "round": 1,
-      "responseId": "chatcmpl-911d0933-3a09-9f1f-bca3-9cbf1fbbc237",
-      "model": "qwen-plus",
-      "usageTokens": 1696,
+      "responseId": "chatcmpl-090ed19a-9cba-91d3-b2e6-3b991d908933",
+      "model": "deepseek-v4.1-flash",
+      "usageTokens": 1832,
       "acceptedProposals": 0,
-      "minUtility": 54
+      "minUtility": 0
     },
     {
       "round": 2,
-      "responseId": "chatcmpl-0f67e2e9-3f92-9a6e-907b-6ac1773c07ab",
-      "model": "qwen-plus",
-      "usageTokens": 2265,
-      "acceptedProposals": 1,
+      "responseId": "chatcmpl-b78baa68-685a-9d5b-b412-2ecc93cb6dcb",
+      "model": "deepseek-v4.1-flash",
+      "usageTokens": 2219,
+      "acceptedProposals": 2,
       "minUtility": 85
     }
   ],
@@ -30,8 +30,8 @@
     "proposalId": "r2-p1",
     "amountFen": 7450,
     "amountYuan": 74.5,
-    "quotedAt": "2026-10-15 13:58:24",
-    "traceId": "30dd69b2817d7c001b3a8d25461fe006",
+    "quotedAt": "2026-10-15 20:48:04",
+    "traceId": "d0ddeceb8c2254cd44f1e5e4ea87e74d",
     "items": [
       {
         "id": "1440",
@@ -59,184 +59,204 @@
       }
     ]
   },
-  "modelTraceCount": 2,
-  "mcpTraceCount": 20,
+  "modelTraceCount": 5,
+  "mcpTraceCount": 19,
   "traces": [
     {
-      "id": "96e14a2a-2884-493c-ac41-fe136d77ed43",
+      "id": "ba2914d6-4080-441b-8e82-c325428adb77",
       "actor": "mcp",
       "action": "now-time-info",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:57.729Z",
-      "traceId": "e2391c4cb7563ec586208df3f9782dbe"
+      "at": "2026-10-15T12:47:50.252Z",
+      "traceId": "b4a1a22ef9d443026f34783734bac095"
     },
     {
-      "id": "32ea98b3-e276-444f-a9b5-485beb9ce583",
+      "id": "1d7fc509-f866-439e-8201-b5cb4d6bb474",
       "actor": "mcp",
       "action": "list-nutrition-foods",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:57.867Z",
-      "traceId": "c88318fd68ac37fdf69982ef435940bb"
+      "at": "2026-10-15T12:47:50.421Z",
+      "traceId": "cc3c7b81b9029cb08d56f5242437b114"
     },
     {
-      "id": "d0c19d46-ca21-4154-9d00-542827d6e643",
+      "id": "67c9ee0c-72d5-46d1-b2cd-8db40cd8d987",
       "actor": "mcp",
       "action": "query-nearby-stores",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:58.186Z",
-      "traceId": "06cfc3e846967d74c39d565dc488c986"
+      "at": "2026-10-15T12:47:50.695Z",
+      "traceId": "87324e2dfe5adee6f838e13d32f2b9b3"
     },
     {
-      "id": "db717ec4-6ddb-4f4e-9f4d-f73f56d239c8",
+      "id": "d56fdd98-9238-46b2-be0e-7d7639f1b276",
       "actor": "mcp",
       "action": "query-meals",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:58.560Z",
-      "traceId": "977e737e43eeed1d3d84667920dd1332"
+      "at": "2026-10-15T12:47:51.015Z",
+      "traceId": "83c89444786759f0e8185eaf1b7e6713"
     },
     {
-      "id": "75754efa-521b-4e39-be11-091f8a352a5e",
+      "id": "e8b56109-6063-464d-8a7d-190473c58881",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:58.683Z",
-      "traceId": "18ed7ddbde0991a0824b635aa5a6c9ab"
+      "at": "2026-10-15T12:47:51.165Z",
+      "traceId": "0c14f75a455fc792b48786058664def1"
     },
     {
-      "id": "b45a1bcb-92a8-4d2a-8fe6-3b516168d7ec",
+      "id": "eb573434-d640-4d87-a9bb-09557c58118e",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:58.786Z",
-      "traceId": "96ab21c0cb2fe8003face48fed71f45b"
+      "at": "2026-10-15T12:47:51.303Z",
+      "traceId": "3c8f0ded4527e936729644fd96ab9cc2"
     },
     {
-      "id": "da035b14-c1dd-45a6-9013-4ade253e3a23",
+      "id": "621b804a-aaed-47eb-99aa-dcfcb75b3ad6",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:58.893Z",
-      "traceId": "355a32b39f5d38c53ca8fc0ed079a5f4"
+      "at": "2026-10-15T12:47:51.407Z",
+      "traceId": "67e0cc24add89426dfc29265c847886b"
     },
     {
-      "id": "f83c27e7-7dac-4a75-ae1f-90836cf98df7",
+      "id": "e921a0d4-d544-4bd6-8fd0-3baedfd1f2ce",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:58.991Z",
-      "traceId": "e883be94f276f10f1dc3ab352c2ecaf2"
+      "at": "2026-10-15T12:47:51.548Z",
+      "traceId": "3ab71587765c53d189a361866033af95"
     },
     {
-      "id": "34ac2872-dd03-4788-99e4-8c78ee38f052",
+      "id": "2de6f704-4276-4f34-8533-89f640e0e28f",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:59.089Z",
-      "traceId": "8afb5a181bedb7c6e27e48510102717f"
+      "at": "2026-10-15T12:47:51.649Z",
+      "traceId": "8b522d14ed4178e01756800404becfa3"
     },
     {
-      "id": "5d8c7587-2d46-4aa7-8321-a714a17f3460",
+      "id": "3bd60587-24cc-4cce-987d-a261f23bb959",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:59.187Z",
-      "traceId": "cda91f82048e9e477f846f89f74e0702"
+      "at": "2026-10-15T12:47:51.749Z",
+      "traceId": "9696d8dd24fbba7b98ccfa608ff6b2d8"
     },
     {
-      "id": "89a8895d-f3ae-42b2-8c0a-91f3cb4b993e",
+      "id": "3d812574-f701-4d66-ac32-eadf2de50ec8",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:59.284Z",
-      "traceId": "5101aab78ee2124eb902726426b626de"
+      "at": "2026-10-15T12:47:51.862Z",
+      "traceId": "b65450f757880639f119397b6d4117b8"
     },
     {
-      "id": "3ea9a638-75ad-4346-86a4-4b096e030a00",
+      "id": "45d758fb-c636-406d-8eb4-35bfa1c86988",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:59.399Z",
-      "traceId": "4b85789b85448a3aa71c20bcae5b0e82"
+      "at": "2026-10-15T12:47:52.037Z",
+      "traceId": "8f2e6068033b771027921333fa636309"
     },
     {
-      "id": "1715ab7f-eb64-428d-ac41-13bbbf81a2a3",
+      "id": "0570934d-73d3-4113-a9bf-1639c36575fc",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:59.527Z",
-      "traceId": "e912c8c2626c1e7ed770d7e0e0f06231"
+      "at": "2026-10-15T12:47:52.191Z",
+      "traceId": "94f39d264a3f2ce038fd70c4ed6850c6"
     },
     {
-      "id": "e7200687-77af-47fe-a2bc-9ec445fd2ec6",
+      "id": "feb85b27-8684-4594-a016-8d8afdf58e62",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:59.634Z",
-      "traceId": "43f91386581fe23f70cc4d803f024f22"
+      "at": "2026-10-15T12:47:52.292Z",
+      "traceId": "9342a9626ba0d4e703630e8de0244f10"
     },
     {
-      "id": "7f6207bf-f7f9-4195-afd1-b9fa07135471",
+      "id": "16313f8f-cb71-43d9-8c56-1bf814fc0b61",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:59.741Z",
-      "traceId": "96f294cb61587bdab0310ca4fa52f1c9"
+      "at": "2026-10-15T12:47:52.413Z",
+      "traceId": "1acbda0e3748ef64e8615c1d36ad14a5"
     },
     {
-      "id": "34778f2f-4f68-43f2-9415-39aaaf700e6f",
+      "id": "c922e7c0-af66-4e8a-88e0-ab696c6f0143",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:59.848Z",
-      "traceId": "a6382ab11ef85d7cab5c8fb4c6216a17"
+      "at": "2026-10-15T12:47:52.530Z",
+      "traceId": "237fd5e9512c8f992a40a1085a29cb87"
     },
     {
-      "id": "654c948d-0152-47f7-a88b-47f9cd647a9c",
+      "id": "8123a842-82e4-4619-a136-72486f681f8f",
       "actor": "mcp",
       "action": "query-meal-detail",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:57:59.958Z",
-      "traceId": "544851221c9c9cddebc8ca273baed93a"
+      "at": "2026-10-15T12:47:52.630Z",
+      "traceId": "895da0d138a7d979b9f526848acc2cb6"
     },
     {
-      "id": "f166d73f-7186-4174-b7ce-c2c86539dc25",
-      "actor": "mcp",
-      "action": "query-meal-detail",
-      "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:58:00.056Z",
-      "traceId": "3955d12765797c715a0375a24c9e1276"
-    },
-    {
-      "id": "b39f5cdd-7f3c-457c-8f14-e759dda29c55",
+      "id": "bc7623fb-955d-4c78-9ee1-e7f41566b4cb",
       "actor": "mcp",
       "action": "calculate-price",
       "message": "官方实时接口调用成功",
-      "at": "2026-10-15T05:58:00.229Z",
-      "traceId": "1ef583dd920efbebbcc5f5176a55d7e3"
+      "at": "2026-10-15T12:47:52.822Z",
+      "traceId": "c2f2c66458d79c5f5560abf63bb831a1"
     },
     {
-      "id": "3dee59ca-efec-48d5-85f4-e2519d7c8805",
+      "id": "36fb21d6-8ca8-4fdc-8e99-40ba84a90208",
+      "actor": "model",
+      "action": "model-response",
+      "message": "第 1 轮第 1 次模型返回，消耗 1832 Token（抵扣方式以百炼账单为准）。",
+      "at": "2026-10-15T12:47:59.484Z",
+      "responseId": "chatcmpl-090ed19a-9cba-91d3-b2e6-3b991d908933",
+      "model": "deepseek-v4.1-flash",
+      "usageTokens": 1832
+    },
+    {
+      "id": "0098704e-b603-4ce6-bb9e-77ec4c8083a7",
+      "actor": "model",
+      "action": "discard-invalid-candidates",
+      "message": "候选 2：候选方案超过共同公开预算，请减少加餐。；候选 3：候选方案超过共同公开预算，请减少加餐。",
+      "at": "2026-10-15T12:47:59.484Z",
+      "responseId": "chatcmpl-090ed19a-9cba-91d3-b2e6-3b991d908933"
+    },
+    {
+      "id": "22a89c82-1abb-4631-ac07-e2d8fdfcead3",
       "actor": "model",
       "action": "submit_table_proposals",
-      "message": "第 1 轮：第一轮探索：用不同价格与口味组合生成3份人均≤30元的套餐，确保每人至少1个main且总价≤90元。",
-      "at": "2026-10-15T05:58:17.536Z",
-      "responseId": "chatcmpl-911d0933-3a09-9f1f-bca3-9cbf1fbbc237"
+      "message": "第 1 轮：第一轮无反馈，用三份不同价格与口味结构的套餐探索：低价单主食、中价主食+配餐、高价含牛肉与甜品，均在90元共同预算内，每人1-3个不重复单品且含主食。",
+      "at": "2026-10-15T12:47:59.484Z",
+      "responseId": "chatcmpl-090ed19a-9cba-91d3-b2e6-3b991d908933"
     },
     {
-      "id": "a7ba605c-f887-4600-bbc5-089ae8ab5c9e",
+      "id": "bdc7bc27-eb8c-49a4-b6e3-a5629c634fb4",
+      "actor": "model",
+      "action": "model-response",
+      "message": "第 2 轮第 1 次模型返回，消耗 2219 Token（抵扣方式以百炼账单为准）。",
+      "at": "2026-10-15T12:48:02.942Z",
+      "responseId": "chatcmpl-b78baa68-685a-9d5b-b412-2ecc93cb6dcb",
+      "model": "deepseek-v4.1-flash",
+      "usageTokens": 2219
+    },
+    {
+      "id": "1fdab50b-48ae-4ef0-8a4f-3da517130d42",
       "actor": "model",
       "action": "submit_table_proposals",
-      "message": "第 2 轮：基于第1轮反馈：a1只接受含1440的组合且效用恒为100；a2最高接受1450+4437（98）；a3最高接受1450+515837（85）。本轮优先保障a1刚性偏好，为a2/a3分别匹配其offers中效用≥83和≥63的可负担组合，三人均满足主食要求且总价≤90。",
-      "at": "2026-10-15T05:58:22.543Z",
-      "responseId": "chatcmpl-0f67e2e9-3f92-9a6e-907b-6ac1773c07ab"
+      "message": "第 2 轮：第1轮仅a1未接受。本轮优先从各人主动提供的可接受报价中挑选：a1选麦辣鸡腿汉堡，a2选麦香鸡+玉米杯，a3选麦香鸡+圆筒冰淇淋，并另备两个组合比较最低满意度。",
+      "at": "2026-10-15T12:48:02.942Z",
+      "responseId": "chatcmpl-b78baa68-685a-9d5b-b412-2ecc93cb6dcb"
     },
     {
-      "id": "555e87be-a2e9-49d0-adbc-1d47fb66e011",
+      "id": "43d22ff1-1e77-4f61-815d-e08303bbb6dd",
       "actor": "mcp",
       "action": "calculate-price",
       "message": "最终餐单官方核价 ¥74.50",
-      "at": "2026-10-15T05:58:23.601Z",
-      "traceId": "30dd69b2817d7c001b3a8d25461fe006"
+      "at": "2026-10-15T12:48:03.966Z",
+      "traceId": "d0ddeceb8c2254cd44f1e5e4ea87e74d"
     }
   ],
   "writeOperationsExecuted": 0,

@@ -23,8 +23,10 @@ function feedbackFor(results: NegotiationResult[]): Feedback[] {
 }
 
 export default function App() {
-  const [mode, setMode] = useState<'live' | 'demo'>(isLocalHost ? 'live' : 'demo');
+  const [mode, setMode] = useState<'live' | 'demo'>('demo');
   const [health, setHealth] = useState<'checking' | 'ready' | 'unavailable'>('checking');
+  const [modelCallBlockReason, setModelCallBlockReason] = useState('');
+  const [configuredModel, setConfiguredModel] = useState('');
   const [profiles, setProfiles] = useState<PrivateProfile[]>(initialProfiles);
   const [activeProfile, setActiveProfile] = useState(0);
   const [showPrivate, setShowPrivate] = useState(true);
@@ -45,7 +47,7 @@ export default function App() {
 
   useEffect(() => {
     if (!isLocalHost) { setHealth('unavailable'); return; }
-    fetch('/api/health').then(async (r) => { const h = await r.json(); setHealth(r.ok && h.modelConfigured ? 'ready' : 'unavailable'); })
+    fetch('/api/health').then(async (r) => { const h = await r.json(); setHealth(r.ok && h.modelConfigured ? 'ready' : 'unavailable'); setModelCallBlockReason(h.modelCallBlockReason ?? ''); setConfiguredModel(h.model ?? ''); })
       .catch(() => setHealth('unavailable'));
   }, []);
   const emit = (event: LiveTrace) => setTraces((previous) => [...previous, event]);
@@ -62,6 +64,7 @@ export default function App() {
 
   async function run() {
     if (busy) return;
+    if (mode === 'live' && health !== 'ready') { setError(modelCallBlockReason || '本地模型服务尚未就绪，请使用离线演示。'); return; }
     clearResult();
     if (profiles.some((p) => !Number.isFinite(p.budget) || p.budget < 1 || (p.maxCalories !== undefined && (!Number.isFinite(p.maxCalories) || p.maxCalories < 1)) || (p.minProtein !== undefined && (!Number.isFinite(p.minProtein) || p.minProtein < 0)))) {
       setError('请检查每个人的预算和营养边界数值。'); return;
@@ -84,7 +87,7 @@ export default function App() {
       const evaluators = profiles.map((p) => createPrivatePreferenceAgent(p, currentTable.menu));
       let feedback: Feedback[] = [];
       for (let round = 1; round <= 3; round++) {
-        setStatus(`千问正在${round === 1 ? '提出首轮餐单' : `根据匿名反馈调整第 ${round} 轮餐单`}…`);
+        setStatus(`协调模型正在${round === 1 ? '提出首轮餐单' : `根据匿名反馈调整第 ${round} 轮餐单`}…`);
         const request = round === 1 ? {} : { feedback, offers: buildLocalOffers(profiles, currentTable.menu) };
         const response = await liveRequest<ProposalRound>(`/api/tables/${currentTable.id}/proposals`, request, 'round', emit);
         setRounds((previous) => [...previous, response]);
@@ -123,17 +126,17 @@ export default function App() {
   return <main>
     <header className="nav shell">
       <a className="brand" href="#top"><span className="brand-mark">密</span><span>麦麦密桌 <small>SecretTable</small></span></a>
-      <div className="nav-actions"><span className="mode-pill"><i />{mode === 'demo' ? '固定数据演示' : health === 'ready' ? '千问 + 麦当劳 MCP 已就绪' : health === 'checking' ? '检测本地服务…' : '等待本地服务'}</span><a className="ghost-link" href="#workbench">进入密桌 ↓</a></div>
+      <div className="nav-actions"><span className="mode-pill"><i />{mode === 'demo' ? '固定数据演示' : health === 'ready' ? '模型 + 麦当劳 MCP 已就绪' : health === 'checking' ? '检测本地服务…' : '等待本地服务'}</span><a className="ghost-link" href="#workbench">进入密桌 ↓</a></div>
     </header>
     <section id="top" className="hero shell">
       <div className="hero-copy"><span className="eyebrow">PRIVATE PREFERENCES. SHARED DECISION.</span>
         <h1>你说不出口的条件，<br />交给自己的 Agent。</h1>
-        <p className="lede">不用在群里解释预算和忌口。你的浏览器负责判断，千问负责寻找共识，麦当劳 MCP 负责真实菜单与核价。</p>
+        <p className="lede">不用在群里解释预算和忌口。你的浏览器负责判断，大模型负责寻找共识，麦当劳 MCP 负责真实菜单与核价。</p>
         <div className="hero-actions"><a className="primary-button hero-cta" href="#workbench">开一桌，试着达成共识 <span>↓</span></a><span className="hero-small">原始个人条件不发送到服务端</span></div>
       </div>
       <div className="hero-visual" aria-label="三个本地评估器与大模型协调器的结构示意">
         <div className="orbit orbit-one"/><div className="orbit orbit-two"/>
-        <div className="core-agent"><span className="core-kicker">QWEN COORDINATOR</span><strong>共识<br/>协调 Agent</strong><small>接收餐单评估反馈</small></div>
+        <div className="core-agent"><span className="core-kicker">MODEL COORDINATOR</span><strong>共识<br/>协调 Agent</strong><small>接收餐单评估反馈</small></div>
         {profiles.map((p, index) => <div className={`satellite satellite-${index + 1}`} key={p.agentId}><span>{index + 1}</span><strong>{p.displayName}</strong><small>在浏览器评估条件</small></div>)}
       </div>
     </section>
@@ -143,8 +146,9 @@ export default function App() {
     <section id="workbench" className="workspace shell">
       <div className="section-heading"><span className="eyebrow">THE NEGOTIATION TABLE</span><h2>这一餐，照顾到每个人。</h2><p>先设置共同地点，再为每位参与者填写只在本页处理的条件。</p></div>
       {!isLocalHost && <p className="public-preview-note">此在线页面使用固定演示数据，不调用模型或 MCP。真实协商可按 <a href="https://github.com/amazingLH/mcd-secret-table" target="_blank" rel="noreferrer">GitHub 项目说明 ↗</a> 在本机运行。原始条件只保留在本页内存。</p>}
+      {isLocalHost && <p className="public-preview-note">{modelCallBlockReason || (health === 'ready' ? `当前模型：${configuredModel}。默认离线演示，不消耗额度。真实协商会调用此模型；免费额度由百炼自动抵扣。请保留百炼的“用完即停”保护；若关闭保护，耗尽后可能计费。` : health === 'checking' ? '默认离线演示，不消耗模型额度。正在检查本地调用配置。' : '本地服务不可用，当前仅可离线演示，不消耗模型额度。')}</p>}
       <fieldset className="table-config panel" disabled={busy}>
-        <div className="mode-tabs" role="group" aria-label="运行模式"><button type="button" disabled={!isLocalHost} title={!isLocalHost ? '真实协商请在本机启动服务' : ''} className={mode === 'live' ? 'selected' : ''} onClick={() => { setMode('live'); clearResult(); }}>真实协商</button><button type="button" className={mode === 'demo' ? 'selected' : ''} onClick={() => { setMode('demo'); clearResult(); }}>离线演示</button></div>
+        <div className="mode-tabs" role="group" aria-label="运行模式"><button type="button" disabled={!isLocalHost || health !== 'ready'} title={!isLocalHost ? '真实协商请在本机启动服务' : modelCallBlockReason} className={mode === 'live' ? 'selected' : ''} onClick={() => { setMode('live'); clearResult(); }}>真实协商</button><button type="button" className={mode === 'demo' ? 'selected' : ''} onClick={() => { setMode('demo'); clearResult(); }}>离线演示</button></div>
         <label>共同城市<input value={city} onChange={(e) => { setCity(e.target.value); clearResult(); }} maxLength={30}/></label>
         <label>共同用餐地点<input value={keyword} onChange={(e) => { setKeyword(e.target.value); clearResult(); }} maxLength={100}/></label>
         <label>公开总预算 · 元<input type="number" min={20} max={1000} value={budget} onChange={(e) => { setBudget(Number(e.target.value)); clearResult(); }}/></label>
@@ -169,10 +173,10 @@ export default function App() {
             <div className="proposal-rank">0{index + 1}</div><div className="proposal-name"><strong>{result.proposal.label}</strong><span>参考合计 ¥{total(result, menu).toFixed(2)}</span></div>
             <div className="votes" aria-label="各参与者的本地评估分数">{result.evaluations.map((e) => <span title={`${e.agentId}：${e.accepted ? '接受' : '拒绝'}`} className={e.accepted ? 'pass' : 'fail'} key={e.agentId}>{e.utility}</span>)}</div>
             <div className="fair-score"><span>最低满意度</span><strong>{result.fairness}</strong></div>
-          </div>)}</div>{rounds.at(-1) && <p className="model-explanation">千问：{rounds.at(-1)!.explanation}</p>}</> : <div className="empty-state"><span>◎</span><strong>共识从一次尝试开始</strong><p>模型提出餐单后，各人的浏览器评估器会独立判断是否接受。</p></div>}
+          </div>)}</div>{rounds.at(-1) && <p className="model-explanation">协调模型：{rounds.at(-1)!.explanation}</p>}</> : <div className="empty-state"><span>◎</span><strong>共识从一次尝试开始</strong><p>模型提出餐单后，各人的浏览器评估器会独立判断是否接受。</p></div>}
         </article>
         <article className="panel trace-panel"><div className="panel-head"><div><span className="panel-index">03</span><h3>本次真实运行轨迹</h3></div><span className="trace-id">{mode === 'live' ? 'REAL CALLS ONLY' : 'DEMO'}</span></div>
-          <div className="live-trace" aria-live="polite">{traces.length ? traces.map((event) => <div className="live-event" key={event.id}><span className={`event-badge ${event.actor}`}>{event.actor === 'model' ? '千问' : event.actor === 'mcp' ? 'MCP' : '本地'}</span><div><strong>{event.action}</strong><p>{event.message}</p>{(event.traceId || event.responseId) && <small>{event.traceId ? 'traceId' : 'responseId'}: {event.traceId || event.responseId}</small>}</div></div>) : <p className="trace-empty">尚未执行。运行后的每条记录都来自实际调用或本地评估。</p>}</div>
+          <div className="live-trace" aria-live="polite">{traces.length ? traces.map((event) => <div className="live-event" key={event.id}><span className={`event-badge ${event.actor}`}>{event.actor === 'model' ? '模型' : event.actor === 'mcp' ? 'MCP' : '本地'}</span><div><strong>{event.action}</strong><p>{event.message}</p>{(event.traceId || event.responseId) && <small>{event.traceId ? 'traceId' : 'responseId'}: {event.traceId || event.responseId}</small>}</div></div>) : <p className="trace-empty">尚未执行。运行后的每条记录都来自实际调用或本地评估。</p>}</div>
         </article>
         <article className={`panel result-panel live-result ${winner ? 'revealed' : ''}`}><div className="panel-head"><div><span className="panel-index">04</span><h3>最终餐单</h3></div><span className="consensus-badge">{quote && winner ? '核价后全员通过' : mode === 'demo' ? '仅演示' : '等待共识'}</span></div>
           {winner ? <><div className="score-ring"><strong>{winner.fairness}</strong><span>最低满意度</span></div><div className="meal-assignments">{winner.proposal.assignments.map((assignment) => <div key={assignment.agentId}><span>{assignment.agentId.toUpperCase()}</span><strong>{assignment.itemIds.map((id) => menu.find((item) => item.id === id)?.name).join(' + ')}</strong></div>)}</div>
@@ -183,7 +187,7 @@ export default function App() {
       </div>
       <div className="run-bar"><div role="status"><strong>{status}</strong>{table && <small>{table.store.name} · {table.menu.length} 项已核实餐品 · {table.model}</small>}</div><button className="primary-button" disabled={busy} onClick={run}>{busy ? '真实调用进行中…' : mode === 'live' ? '开始真实协商 →' : '运行离线演示 →'}</button></div>
       {error && <div className="error-banner" role="alert">{error}</div>}
-      <details className="implementation-note"><summary>数据流与当前能力边界</summary><p>原始预算、忌口和营养条件在当前浏览器计算。后端和千问会收到共同地点、公开预算、匿名编号、候选评分，以及第二轮起本地主动提供的少量可接受餐品组合。这些信号仍可能透露偏好，不能提供密码学意义的隐私保证。</p><p>真实模式使用官方在售菜单、餐品详情、营养数据和 calculate-price；初始价格用于生成候选，最终餐单会再次整单核价。未知营养数据不会当作零值通过营养约束。最多三轮，无解时明确显示未达成共识。当前版本只生成与确认餐单，不调用下单、支付、领券或兑换工具。</p><p>模型调用会消耗你所配置模型账户的额度。所有密钥仅供本地 Node.js 服务使用，不进入网页。</p></details>
+      <details className="implementation-note"><summary>数据流与当前能力边界</summary><p>原始预算、忌口和营养条件在当前浏览器计算。后端和协调模型会收到共同地点、公开预算、匿名编号、候选评分，以及第二轮起本地主动提供的少量可接受餐品组合。这些信号仍可能透露偏好，不能提供密码学意义的隐私保证。</p><p>真实模式使用官方在售菜单、餐品详情、营养数据和 calculate-price；初始价格用于生成候选，最终餐单会再次整单核价。未知营养数据不会当作零值通过营养约束。最多三轮，无解时明确显示未达成共识。当前版本只生成与确认餐单，不调用下单、支付、领券或兑换工具。</p><p>模型调用会消耗你所配置模型账户的额度。所有密钥仅供本地 Node.js 服务使用，不进入网页。</p></details>
     </section>
     <footer className="footer shell"><div><strong>麦麦密桌 SecretTable</strong><span>麦当劳程序员创意开发大赛参赛作品 · 非麦当劳官方产品</span></div><span>Private preferences. Shared decisions.</span></footer>
   </main>;

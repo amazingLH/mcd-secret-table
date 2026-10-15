@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseNutrition, describeItem } from '../server/catalog';
-import { onlyKeys, validateProposals, validateFeedback } from '../server/validation';
+import { onlyKeys, validateProposals, validateFeedback, selectValidProposals } from '../server/validation';
 import { createPrivatePreferenceAgent } from '../src/agent/negotiator';
 import { evaluateOfficialQuote } from '../src/agent/quoteEvaluation';
 import { parseToolArguments } from '../server/model';
@@ -15,6 +15,20 @@ const profiles: PrivateProfile[] = ['a1','a2'].map((agentId)=>({agentId,displayN
 const quote: OfficialQuote = {proposalId:proposal.id,amountFen:3400,amountYuan:34,quotedAt:'',traceId:'test',items:[{id:'1450',name:'麦香鸡',quantity:2,subtotalFen:3400}]};
 
 describe('真实餐单校验', () => {
+  it('逐份保留合法模型候选，淘汰超预算附加方案而不浪费重试', () => {
+    const overBudget = { ...proposal, assignments: proposal.assignments.map((a) => ({ ...a, itemIds: ['1450', 'side'] })) };
+    const menu = [...table.menu, { ...item, id: 'side', name: 'test side', kind: 'side' as const, price: 10 }];
+    const result = selectValidProposals({ explanation: 'test', proposals: [overBudget, proposal] }, { ...table, menu }, 1);
+    expect(result.proposals).toHaveLength(1);
+    expect(result.proposals[0].id).toBe('r1-p2');
+    expect(result.rejected[0]).toContain('超过共同公开预算');
+  });
+  it('逐份过滤也不允许全部非法、编造商品或缺少说明的输出通过', () => {
+    const invented = { ...proposal, assignments: proposal.assignments.map((a) => ({ ...a, itemIds: ['invented'] })) };
+    expect(() => selectValidProposals({ explanation: 'test', proposals: [invented] }, table, 1)).toThrow('未知或重复商品');
+    expect(() => selectValidProposals({ proposals: [proposal] }, table, 1)).toThrow('模型说明格式无效');
+    expect(() => selectValidProposals({ explanation: 'test', proposals: [] }, table, 1)).toThrow();
+  });
   it('仅规范化缺失的根对象结束符，不补造内容或截断字段',()=>{
     expect(parseToolArguments('{"explanation":"test","proposals":[]}')).toEqual({explanation:'test',proposals:[]});
     expect(parseToolArguments('{"explanation":"test","proposals":[]')).toEqual({explanation:'test',proposals:[]});

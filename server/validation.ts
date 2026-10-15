@@ -73,6 +73,28 @@ export function validateFeedback(value: unknown, last: Proposal[], table: LiveTa
   });
 }
 
+// Validate every candidate with the same hard rules. An invalid extra candidate
+// must not discard a separately valid model-generated one or trigger paid retries.
+export function selectValidProposals(value: unknown, table: LiveTable, round: number) {
+  const payload = object(value);
+  if (!Array.isArray(payload.proposals) || payload.proposals.length < 1 || payload.proposals.length > 4) {
+    throw new PublicError('模型须提供 1–4 份候选方案。');
+  }
+  const proposals: Proposal[] = [];
+  const rejected: string[] = [];
+  for (const [index, candidate] of payload.proposals.entries()) {
+    try {
+      const result = validateProposals({ ...payload, proposals: [candidate] }, table, round);
+      proposals.push({ ...result.proposals[0], id: `r${round}-p${index + 1}` });
+    } catch (error) {
+      if (!(error instanceof PublicError)) throw error;
+      rejected.push(`候选 ${index + 1}：${error.message}`);
+    }
+  }
+  if (!proposals.length) throw new PublicError(rejected.join('；'));
+  return { explanation: payload.explanation as string, proposals, rejected };
+}
+
 export function validateOffers(value: unknown, table: LiveTable): LocalOffer[] {
   if (value === undefined) return [];
   if (!Array.isArray(value) || value.length > 36) throw new PublicError('可接受报价过多。');
