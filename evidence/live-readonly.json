@@ -1,0 +1,87 @@
+{
+  "mode": "live-readonly",
+  "verifiedAt": "2026-10-15T05:40:24.244Z",
+  "server": "https://mcp.mcd.cn",
+  "scope": "公共测试地点的 MCP 接入与三份单品核价；不代表网页或 LLM Agent 已完成实时集成。",
+  "toolCount": 35,
+  "testLocation": {
+    "city": "上海",
+    "keyword": "人民广场",
+    "source": "固定公共地点，非用户位置"
+  },
+  "store": {
+    "code": "1450713",
+    "name": "麦当劳上海黄浦华旭国际大厦餐厅"
+  },
+  "uniqueMenuItems": 117,
+  "nutritionRecords": 160,
+  "quote": {
+    "currency": "CNY",
+    "amountFen": 6300,
+    "amountYuan": "63.00",
+    "items": [
+      {
+        "productCode": "1440",
+        "productName": "麦辣鸡腿汉堡",
+        "quantity": 1,
+        "subtotalFen": 2250
+      },
+      {
+        "productCode": "1406",
+        "productName": "板烧鸡腿堡",
+        "quantity": 1,
+        "subtotalFen": 2350
+      },
+      {
+        "productCode": "1450",
+        "productName": "麦香鸡",
+        "quantity": 1,
+        "subtotalFen": 1700
+      }
+    ]
+  },
+  "calls": [
+    {
+      "tool": "now-time-info",
+      "traceId": "7f31a74e7d09adbbe260fd496044efec",
+      "serverTime": "2026-10-15 13:40:23"
+    },
+    {
+      "tool": "list-nutrition-foods",
+      "traceId": "13d5f66cee9c3dd84f4ec6fa9a7f8269",
+      "serverTime": "2026-10-15 13:40:23"
+    },
+    {
+      "tool": "query-nearby-stores",
+      "traceId": "0d3b3fd8964d3fa23dc55c7604c2941c",
+      "serverTime": "2026-10-15 13:40:23"
+    },
+    {
+      "tool": "query-meals",
+      "traceId": "000ec0802b8f888e6ea2591d92a539db",
+      "serverTime": "2026-10-15 13:40:24"
+    },
+    {
+      "tool": "query-meal-detail",
+      "traceId": "0278df2709e805a062be5a5f489e7a76",
+      "serverTime": "2026-10-15 13:40:24"
+    },
+    {
+      "tool": "query-meal-detail",
+      "traceId": "b20ac606cb520dab7ca0d19391f000db",
+      "serverTime": "2026-10-15 13:40:24"
+    },
+    {
+      "tool": "query-meal-detail",
+      "traceId": "edb29dace7a64ae437385d6541c51632",
+      "serverTime": "2026-10-15 13:40:24"
+    },
+    {
+      "tool": "calculate-price",
+      "traceId": "2f71f06d0e1f09623cfd176985cba838",
+      "serverTime": "2026-10-15 13:40:24"
+    }
+  ],
+  "writeOperationsExecuted": 0,
+  "credentialsIncluded": false
+}
